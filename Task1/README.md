@@ -39,9 +39,7 @@
 6. [🐍 Step 4 — Lambda Code (Boto3)](#-step-4--lambda-code-boto3)
 7. [🧪 Step 5 — Testing & Verification](#-step-5--testing--verification)
 8. [💬 Discussion — Lambda vs. S3 Lifecycle Rules](#-discussion--lambda-vs-s3-lifecycle-rules)
-9. [🐞 Troubleshooting Reference](#-troubleshooting-reference)
-10. [📸 Screenshot Index](#-screenshot-index)
-11. [🏁 Summary](#-summary)
+9. [🏁 Summary](#-summary)
 
 ---
 
@@ -77,16 +75,20 @@ flowchart LR
 
 **STEP 1   Create the S3 Bucket and Upload Test Files**
 
-<img width="1225" height="494" alt="image" src="https://github.com/user-attachments/assets/494bc5e6-770d-403e-992f-b16a1dfa6baa" />
-
+------------------------------------------------------------------
+Selected General Purpose > Added Bucket Name
 ------------------------------------------------------------------
 
 <img width="1222" height="521" alt="image" src="https://github.com/user-attachments/assets/7a9a0d36-e6ff-4267-b401-fdbe9aaf0fbc" />
 
+------------------------------------------------------------------
+Checked Block Public Access settings for this bucket
 -------------------------------------------------------------------
 
 <img width="1224" height="569" alt="image" src="https://github.com/user-attachments/assets/7a8c0edb-f6c3-4c07-8baf-a0411708b61d" />
 
+------------------------------------------------------------------
+Uploaded few sample files
 --------------------------------------------------------------------
 
 <img width="1223" height="545" alt="image" src="https://github.com/user-attachments/assets/c6e81c9e-d5e4-4c5d-8613-31e5edf5471b" />
@@ -94,17 +96,11 @@ flowchart LR
 --------------------------------------------------------------------
 | Setting | Value |
 |---|---|
-| **Bucket name** | `s3-cleanup-lab-<your-initials>` |
+| **Bucket name** | `dhanas3bucketobjectcleanup` |
 | **Region** | e.g. `us-east-1` |
-| **Test objects** | Upload 3–5 sample files (`.txt` / `.log`) |
+| **Test objects** | Upload 3–5 sample files (`.csv` / `.png`) |
 
-> 🧪 **Testing tip:** You can't easily backdate an object's `LastModified`. Instead, set `MAX_AGE_MINUTES` (or seconds) in the Lambda env vars for your first test run, confirm deletion works, then switch the code to the real **30-day** threshold before final submission.
 
-📸 **Screenshot:**
-```
-![S3 Bucket Created](screenshots/01-s3-bucket-created.png)
-![Test Objects Uploaded](screenshots/02-s3-objects-uploaded.png)
-```
 
 ---
 
@@ -154,19 +150,27 @@ flowchart LR
 ```
 </details>
 
-📸 **Screenshot:**
+📸 **Steps and Screenshot:**
 
+-----------------------------------
+Selected AWS services and Lambda
 -----------------------------------
 <img width="1225" height="597" alt="image" src="https://github.com/user-attachments/assets/7c4f0c65-cc2e-4902-8114-99357f2b6731" />
 
+-----------------------------------
+Created Role
 -----------------------------------
 
 <img width="1226" height="620" alt="image" src="https://github.com/user-attachments/assets/355283af-b421-4edb-b8a1-4c65d2dea9b2" />
 
 -----------------------------------
+Created inline Policy
+-----------------------------------
 
 <img width="1223" height="618" alt="image" src="https://github.com/user-attachments/assets/effe63f8-6ca0-4217-8776-deebcf575eb5" />
 
+-----------------------------------
+Verified policy attached to role
 ----------------------------------
 
 <img width="1223" height="596" alt="image" src="https://github.com/user-attachments/assets/05bd79d4-8533-4b93-bc07-150afd2b03ea" />
@@ -185,28 +189,31 @@ flowchart LR
 
 | Setting | Value |
 |---|---|
-| **Function name** | `s3-bucket-cleanup` |
+| **Function name** | `s3-stale-object-cleanup` |
 | **Runtime** | Python 3.12 |
-| **Execution role** | `lambda-s3-cleanup-role` |
+| **Execution role** | `lambda-s3-cleanup-role` | 
 | **Timeout** | 1 min |
-| **Env var** `BUCKET_NAME` | `s3-cleanup-lab-<your-initials>` |
+| **Env var** `BUCKET_NAME` | `dhanas3bucketobjectcleanup` |
 | **Env var** `MAX_AGE_DAYS` | `30` *(temporarily lower for testing)* |
 
-📸 **Screenshot:**
-
+📸 **Steps and Screenshot:**
+------------------------------------------
+Selected Author from scratch , named s3-stale-object-cleanup
 ------------------------------------------
 <img width="1222" height="621" alt="image" src="https://github.com/user-attachments/assets/8b2269d1-95a3-469b-b4ce-bab4a52ef98e" />
 
+------------------------------------------
+Expand Change default execution role → select Use an existing role → pick lambda-s3-cleanup-role from the dropdown ..
 -----------------------------------------
 <img width="1224" height="624" alt="image" src="https://github.com/user-attachments/assets/67e4c9b2-ae48-4bbb-9a56-31bedf98e46d" />
 
 ------------------------------------------
+Created Lambda Function
+------------------------------------------
 <img width="1220" height="429" alt="image" src="https://github.com/user-attachments/assets/1f89cda2-7f53-40d1-b9cb-f8f3a15115cb" />
 
 -----------------------------------------
-<img width="1224" height="607" alt="image" src="https://github.com/user-attachments/assets/aa1e7bd7-2ad5-4719-878d-7b5285727037" />
 
------------------------------------------
 ---
 
 ## 🐍 Step 4 — Lambda Code (Boto3)
@@ -256,8 +263,13 @@ def lambda_handler(event, context):
 
 > 🧠 **Why the paginator?** `list_objects_v2` caps results at 1,000 keys per call. The paginator transparently walks every page, so buckets with tens of thousands of objects are still fully covered.
 
-📸 **Screenshot:**
+📸 **Screenshot and steps**
+-------------------------------------
+Added lambda function code and deployed 
+-----------------------------------------
+<img width="1224" height="607" alt="image" src="https://github.com/user-attachments/assets/aa1e7bd7-2ad5-4719-878d-7b5285727037" />
 
+-----------------------------------------
 -------------------------------------
 <img width="1205" height="486" alt="image" src="https://github.com/user-attachments/assets/ca7b9255-8f30-493c-8a3f-c519e2f1637d" />
 
@@ -268,16 +280,9 @@ def lambda_handler(event, context):
 ## 🧪 Step 5 — Testing & Verification
 
 
-| ✅ Check | Expected Outcome |
-|---|---|
-| Lambda execution status | `Succeeded`, no errors |
-| Deleted object count (test run) | Matches objects older than the lowered test threshold |
-| Remaining objects | Only newer files present in the bucket |
-| Final code | `MAX_AGE_DAYS` reset to `30` before submission |
-
 📸 **Testing steps and Screenshot:**
 
-**Test → For testing purpose changed Threshold to 5 mins from 30 days  for testing purpose and Ran Lambda manually**
+🧪 **Test → For testing purpose changed Threshold to 5 mins from 30 days  for testing purpose and Ran Lambda manually**
 
 
 ----------------------------------------------------
@@ -312,6 +317,15 @@ def lambda_handler(event, context):
    <img width="1322" height="612" alt="image" src="https://github.com/user-attachments/assets/2e8108e4-57c2-491f-b935-269b7aa396e7" />
 
 -----------------------------------------
+
+| ✅ Check |  Outcome was as Expected |
+|---|---|
+| Lambda execution status | `Succeeded`, no errors |
+| Deleted object count (test run) | Matches objects older than the lowered test threshold |
+| Remaining objects | Only newer files present in the bucket |
+| Final code | `MAX_AGE_DAYS` reset to `30` before submission |
+
+
 ---
 
 ## 💬 Discussion — Lambda vs. S3 Lifecycle Rules
