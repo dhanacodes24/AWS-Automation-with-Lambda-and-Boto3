@@ -120,21 +120,26 @@ flowchart LR
 *Created IAM Role -->  lambda-ec2-autotag-role
 -------------------------------
 
+<img width="1006" height="483" alt="image" src="https://github.com/user-attachments/assets/3d667820-164f-4bd9-8b5e-ffb88154928d" />
 
 -------------------------------
-
+*Updated inline policy 
 --------------------------------
+<img width="1243" height="596" alt="image" src="https://github.com/user-attachments/assets/525486e6-35d9-4d0d-81b4-06858591ff66" />
+
 -------------------------------
+Confirmed that inline policy is attached to the Role
 -------------------------------
 
+<img width="1301" height="641" alt="image" src="https://github.com/user-attachments/assets/420822c7-66fd-442e-8414-89aa89cf85da" />
 
----
+------------------------------
 
 ## 🧠 Step 2 — Lambda Function Setup
 
 | Setting | Value |
 |---|---|
-| **Function name** | `ec2-auto-tag` |
+| **Function name** | `ec2-auto-tagger` |
 | **Runtime** | Python 3.12 |
 | **Execution role** | `lambda-ec2-autotag-role` |
 | **Timeout** | 30 sec |
@@ -143,15 +148,10 @@ flowchart LR
 📸 **Steps and Screenshots:**
 
 -------------------------------
-
+** Created lambda function and selected Custom execution role
 --------------------------------
--------------------------------
--------------------------------
+<img width="1305" height="698" alt="image" src="https://github.com/user-attachments/assets/70f690f1-5cf1-4dad-9b20-378acbef9760" />
 
--------------------------------
-
---------------------------------
--------------------------------
 -------------------------------
 
 ---
@@ -201,9 +201,13 @@ def lambda_handler(event, context):
 </details>
 
 📸 **Screenshot:**
-```
-![Lambda Code Deployed](screenshots/05-lambda-code.png)
-```
+
+-------------------------------
+*Deployed lambda function 
+--------------------------------
+<img width="1276" height="666" alt="image" src="https://github.com/user-attachments/assets/c240fd3f-3293-4d7c-b359-9ce2133b316d" />
+
+-------------------------------
 
 ---
 
@@ -230,26 +234,74 @@ def lambda_handler(event, context):
 </details>
 
 📸 **Steps and Screenshots:**
-```
-![EventBridge Rule Created](screenshots/06-eventbridge-rule.png)
-![Event Pattern Configuration](screenshots/07-eventbridge-pattern.png)
-```
+
+-------------------------------
+**Selected Rule in EventBridge
+-------------------------------
+
+<img width="1301" height="646" alt="image" src="https://github.com/user-attachments/assets/94fc5a26-0bd4-4120-8553-9ef9f530def9" />
+
+-------------------------------
+*Updated details and created Rule
+-------------------------------
+
+<img width="1300" height="611" alt="image" src="https://github.com/user-attachments/assets/5661ad71-9e00-4924-9ca2-51d14774d63b" />
+
+-------------------------------
+*EventBridge automatically adds the required resource-based permission to the Lambda function so the rule can invoke it — verify this under the Lambda function's Configuration  →  Permissions  →  Resource-based policy statements.
+-------------------------------
+<img width="1216" height="602" alt="image" src="https://github.com/user-attachments/assets/6895d2d4-fe92-4e53-ab61-ce6d82ef855e" />
 
 -------------------------------
 
---------------------------------
--------------------------------
--------------------------------
-
--------------------------------
-
---------------------------------
--------------------------------
--------------------------------
 
 ---
 
 ## 🧪 Step 5 — Testing & Verification
+
+
+
+📸 **Steps and Screenshots for testing:**
+
+-------------------------------
+*For testing launched first Ec2 instance and confirmed it moved Running status
+--------------------------------
+<img width="972" height="481" alt="image" src="https://github.com/user-attachments/assets/b8cd632f-ec69-476e-b28a-466399d69344" />
+
+-------------------------------
+*Monitored Lambda metrics
+-------------------------------
+<img width="969" height="480" alt="image" src="https://github.com/user-attachments/assets/9997d443-17f9-4f09-9688-f8478081fcc1" />
+
+-------------------------------
+*Checked CloudWatch logs 
+--------------------------------
+<img width="971" height="476" alt="image" src="https://github.com/user-attachments/assets/5bf85f9c-865a-419e-a874-2cbb40a7b41c" />
+
+-------------------------------
+*Checked EC2 instanced and confirmed that tags are successfully created
+-------------------------------
+<img width="967" height="481" alt="image" src="https://github.com/user-attachments/assets/8941ad80-c0fa-4384-9dce-e3dee30c096f" />
+
+-------------------------------
+*Luanched second EC2 instance  , waited and confirmed tag has been created 
+-------------------------------
+<img width="971" height="490" alt="image" src="https://github.com/user-attachments/assets/75cf56d3-df3b-4560-94fe-967959f33028" />
+
+-------------------------------
+*Monitored lambda function metrics
+-------------------------------
+<img width="967" height="499" alt="image" src="https://github.com/user-attachments/assets/57c327a8-528a-43ca-850a-3f1adad61f0d" />
+
+-------------------------------
+*Monitored  Eventbridge metrics
+-------------------------------
+<img width="974" height="488" alt="image" src="https://github.com/user-attachments/assets/d1b4c9c8-79dc-4316-91d6-6aece934d16f" />
+
+-------------------------------
+
+---
+
 
 | ✅ Check | Expected Outcome |
 |---|---|
@@ -257,26 +309,6 @@ def lambda_handler(event, context):
 | EventBridge rule triggers | Rule invocation count increments |
 | Lambda execution | `Succeeded`, no errors |
 | Tags on instance | `LaunchDate`, `Environment`, `AutoTagged` visible within seconds of launch |
-
-📸 **Steps and Screenshots:**
-```
-![New Instance Launched](screenshots/08-instance-launched.png)
-![CloudWatch Logs - Tagging Confirmation](screenshots/09-cloudwatch-logs.png)
-![Tags Visible on Instance](screenshots/10-instance-tags.png)
-```
--------------------------------
-
---------------------------------
--------------------------------
--------------------------------
-
--------------------------------
-
---------------------------------
--------------------------------
--------------------------------
----
-
 ## 🌟 Bonus — Auto-Resolve Owner via CloudTrail
 
 > A popular interview scenario: instead of a static `Owner` tag, look up **who actually launched the instance** via CloudTrail's `RunInstances` event and tag it automatically.
