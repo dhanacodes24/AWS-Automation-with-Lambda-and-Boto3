@@ -114,15 +114,21 @@ flowchart LR
 ** Received confirm subscription email
 --------------------------------------
 
+<img width="989" height="413" alt="image" src="https://github.com/user-attachments/assets/9b8086a7-94b8-49b8-a722-c933be347799" />
 
 
 --------------------------------------
 
 ** Confirmed subscriptions
 --------------------------------------
+<img width="808" height="405" alt="image" src="https://github.com/user-attachments/assets/16f6febb-f11b-41e3-b10b-61f1f8b4a5bb" />
+
 --------------------------------------
 Confirmed status of subscription 
 --------------------------------------
+
+<img width="1001" height="345" alt="image" src="https://github.com/user-attachments/assets/2b38fcf2-2b59-47f4-8f0e-97faa8f527cd" />
+
 --------------------------------------
 ---
 
@@ -181,24 +187,30 @@ Confirmed status of subscription
 </details>
 
 📸 **Steps and Screenshots**
-```
-![IAM Role Creation](screenshots/03-iam-role.png)
-![Inline Policy Attached](screenshots/04-iam-policy.png)
-```
+
 --------------------------------------
 ** Selected AWS service and lambda 
 --------------------------------------
+<img width="1001" height="395" alt="image" src="https://github.com/user-attachments/assets/90ef7e5e-3235-4a8d-83da-ee8d094ecc08" />
+
 --------------------------------------
 ** Created role lambda-s3-public-audit-role
 --------------------------------------
+<img width="1002" height="462" alt="image" src="https://github.com/user-attachments/assets/91de091c-c122-4f22-8e02-e25b813f4d25" />
 
 --------------------------------------
 ** Created inline policy S3PublicAuditInlinePolicy
 --------------------------------------
+<img width="1002" height="492" alt="image" src="https://github.com/user-attachments/assets/5ae9f9c7-600d-4fa5-b1d8-8a99c87ed000" />
+
 --------------------------------------
 
 ** Confirmed that policy attached to the role
 --------------------------------------
+
+<img width="1002" height="472" alt="image" src="https://github.com/user-attachments/assets/a411abc1-b729-453f-85c8-c361f453a03c" />
+
+
 --------------------------------------
 ---
 
@@ -213,10 +225,14 @@ Confirmed status of subscription
 | **Env var** `SNS_TOPIC_ARN` | `arn:aws:sns:us-east-1:<account-id>:s3-public-access-alerts` |
 
 📸 **Steps and Screenshots**
-```
-![Lambda Function Created](screenshots/05-lambda-create.png)
-![Environment Variables](screenshots/06-lambda-env-vars.png)
-```
+
+--------------------------------------
+** Selected Author from scratch in lambda function , selected Custom execution role and created Lambda function
+--------------------------------------
+
+<img width="1002" height="519" alt="image" src="https://github.com/user-attachments/assets/b6c02c07-b975-4438-abd5-5bcd2842e7cf" />
+
+--------------------------------------
 
 ---
 
@@ -402,15 +418,12 @@ def publish_alert(flagged_buckets):
 </details>
 
 📸 **Steps and Screenshots:**
-```
-![Lambda Code Deployed](screenshots/07-lambda-code.png)
-```
---------------------------------------
-** Selected Author from scratch in lambda function and selected Custome execution role
---------------------------------------
---------------------------------------
+
+
 ** Deployed lambda function
 --------------------------------------
+<img width="991" height="529" alt="image" src="https://github.com/user-attachments/assets/a75e8ec9-38eb-42bf-a1d9-a6958b3256ba" />
+
 
 --------------------------------------
 
@@ -431,18 +444,26 @@ def publish_alert(flagged_buckets):
 ![EventBridge Daily Schedule](screenshots/08-eventbridge-schedule.png)
 ```
 --------------------------------------
-** Selected schedule from EventBridge
+** Selected schedule option  from EventBridge
 --------------------------------------
+<img width="1001" height="525" alt="image" src="https://github.com/user-attachments/assets/9d0048f1-f8dd-48be-b437-1b490b33fcf9" />
+
 --------------------------------------
 ** Selected AWS lambda 
 --------------------------------------
+<img width="1001" height="473" alt="image" src="https://github.com/user-attachments/assets/7c169ab9-c867-4869-826e-f787e54e2bcc" />
+
 
 --------------------------------------
 ** Selected below options
 --------------------------------------
+<img width="998" height="530" alt="image" src="https://github.com/user-attachments/assets/cb0a4270-93cc-4415-acef-4a69cb6b4e25" />
+
 --------------------------------------
 ** Created schedule 
 --------------------------------------
+<img width="1001" height="439" alt="image" src="https://github.com/user-attachments/assets/7bc39295-d7f5-41c1-9afb-cdd75cb9535e" />
+
 --------------------------------------
 
 ---
@@ -467,12 +488,21 @@ def publish_alert(flagged_buckets):
 --------------------------------------
 *Created  S3 bucket 
 --------------------------------------
+<img width="1000" height="543" alt="image" src="https://github.com/user-attachments/assets/75cb6a8d-1cbb-4549-8e8f-954e27440948" />
+
 --------------------------------------
 *Unchecked Block Public Access setting for this bucket for testing
 --------------------------------------
+<img width="999" height="548" alt="image" src="https://github.com/user-attachments/assets/d992d85d-e8de-4bd9-93fd-68ace17ac109" />
 
 --------------------------------------
 *Edited bucket policy for testing purpose 
+--------------------------------------
+
+<img width="1002" height="424" alt="image" src="https://github.com/user-attachments/assets/06cf0480-d7bc-48f4-bec1-a810e7abdb76" />
+
+<img width="1001" height="531" alt="image" src="https://github.com/user-attachments/assets/d4248302-a579-4d10-b95a-bfc3f46cbfd5" />
+
 --------------------------------------
 
 <details>
@@ -500,27 +530,43 @@ def publish_alert(flagged_buckets):
 
 --------------------------------------
 --------------------------------------
-*Now manually invoke lambda function
+*Now manually invoke lambda function from Test
 --------------------------------------
+
+<img width="1005" height="558" alt="image" src="https://github.com/user-attachments/assets/1bd5daa3-ac63-4bae-aeb7-9284381ab6ef" />
+
 --------------------------------------
 **Tested response 
 --------------------------------------
+<img width="1002" height="520" alt="image" src="https://github.com/user-attachments/assets/c0083d53-e70d-42a7-b3eb-06a3e0682b21" />
+
 --------------------------------------
 *Received  email alert about Publicly accessible S3 bucket
 --------------------------------------
+<img width="975" height="377" alt="image" src="https://github.com/user-attachments/assets/3f330802-393c-420f-9eee-3a99c2d4cfae" />
+
 --------------------------------------
 *Verified CloudWatch logs
 --------------------------------------
+<img width="1007" height="497" alt="image" src="https://github.com/user-attachments/assets/5c3cea3a-6954-4816-8ecb-82219a33e099" />
+
 --------------------------------------
 
 *After testing secured bucket again
 ----------------------------------------------------------------------------
+<img width="1007" height="509" alt="image" src="https://github.com/user-attachments/assets/a1a7c863-3aba-404f-be71-b752984591ab" />
+
 --------------------------------------
 *Reinvoked lambda confirmed no public bucket for verification
 --------------------------------------
+<img width="1001" height="523" alt="image" src="https://github.com/user-attachments/assets/7e234308-5bd9-46be-b053-bf59686adf9d" />
+
 --------------------------------------
 *Verified CloudWatch logs and confirmed no bucket has public access
 --------------------------------------
+
+<img width="1004" height="500" alt="image" src="https://github.com/user-attachments/assets/7e4fce72-3229-4970-a5c6-9f55bd9d648d" />
+
 --------------------------------------
 --------------------------------------
 --------------------------------------
