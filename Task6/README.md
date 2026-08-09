@@ -96,19 +96,26 @@ flowchart LR
 --------------------------------------
 ** Selected Standard Topic*
 --------------------------------------
+<img width="1006" height="563" alt="image" src="https://github.com/user-attachments/assets/c1b4f52b-bd1e-42f0-bf68-b7762ec12772" />
 
 
 --------------------------------------
 **Created Topic --> s3-public-bucket-alerts
 --------------------------------------
+<img width="1007" height="387" alt="image" src="https://github.com/user-attachments/assets/ab381b4a-172e-43e4-9617-b305a5feab61" />
 
 --------------------------------------
 ** Created Subscription
 --------------------------------------
+<img width="1003" height="521" alt="image" src="https://github.com/user-attachments/assets/6ec5d146-3470-485c-8dba-d0317b60b60b" />
+
 --------------------------------------
 
 ** Received confirm subscription email
 --------------------------------------
+
+
+
 --------------------------------------
 
 ** Confirmed subscriptions
