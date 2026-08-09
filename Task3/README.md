@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/AWS%20DEVOPS%20ASSIGNMENT-Auto%20Tagging%20EC2%20Instances%20on%20Launch-0969DA?style=for-the-badge&labelColor=0B3D91" alt="title banner"/>
+### AWS DEVOPS ASSIGNMENT
 
-<br/>
+# 🏷️ Auto-Tagging EC2 Instances on Launch
 
 <img src="https://img.shields.io/badge/Task-03-blue?style=flat-square"/>
 <img src="https://img.shields.io/badge/Service-EC2%20%7C%20Lambda%20%7C%20IAM%20%7C%20EventBridge%20%7C%20CloudTrail-blue?style=flat-square"/>
@@ -39,9 +39,7 @@
 6. [⚡ Step 4 — EventBridge Rule (Launch Trigger)](#-step-4--eventbridge-rule-launch-trigger)
 7. [🧪 Step 5 — Testing & Verification](#-step-5--testing--verification)
 8. [🌟 Bonus — Auto-Resolve Owner via CloudTrail](#-bonus--auto-resolve-owner-via-cloudtrail)
-9. [🐞 Troubleshooting Reference](#-troubleshooting-reference)
-10. [📸 Screenshot Index](#-screenshot-index)
-11. [🏁 Summary](#-summary)
+9. [🏁 Summary](#-summary)
 
 ---
 
@@ -92,7 +90,7 @@ flowchart LR
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "TaggingPermissions",
+      "Sid": "AllowTaggingAndDescribe",
       "Effect": "Allow",
       "Action": [
         "ec2:CreateTags",
@@ -101,21 +99,34 @@ flowchart LR
       "Resource": "*"
     },
     {
-      "Sid": "CloudTrailLookupForOwner",
+      "Sid": "AllowLambdaLogging",
       "Effect": "Allow",
-      "Action": "cloudtrail:LookupEvents",
-      "Resource": "*"
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
     }
   ]
 }
+
 ```
 </details>
 
-📸 **Screenshot:**
-```
-![IAM Role Creation](screenshots/01-iam-role.png)
-![Inline Policy Attached](screenshots/02-iam-policy.png)
-```
+📸 **Steps and Screenshots:**
+
+--------------------------------
+*Created IAM Role -->  lambda-ec2-autotag-role
+-------------------------------
+
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
+
 
 ---
 
@@ -144,43 +155,40 @@ flowchart LR
 
 ```python
 import boto3
-import os
-from datetime import date
-
-ec2 = boto3.client("ec2")
-
-DEFAULT_ENVIRONMENT = os.environ.get("DEFAULT_ENVIRONMENT", "Development")
-
-
+import datetime
+ 
+ec2 = boto3.client('ec2')
+ 
 def lambda_handler(event, context):
-    detail = event.get("detail", {})
-    instance_id = detail.get("instance-id")
-
+    # 1. Extract the instance ID from the EventBridge event
+    detail = event.get('detail', {})
+    instance_id = detail.get('instance-id')
+ 
     if not instance_id:
-        raise ValueError("No instance-id found in event detail")
-
-    launch_date = date.today().isoformat()
-
-    ec2.create_tags(
-        Resources=[instance_id],
-        Tags=[
-            {"Key": "LaunchDate", "Value": launch_date},
-            {"Key": "Environment", "Value": DEFAULT_ENVIRONMENT},
-            {"Key": "AutoTagged", "Value": "true"},
-        ],
-    )
-
-    print(f"Tagged instance {instance_id} with LaunchDate={launch_date}, "
-          f"Environment={DEFAULT_ENVIRONMENT}")
-
+        print('No instance-id found in event, skipping.')
+        return {'statusCode': 400, 'body': 'Missing instance-id'}
+ 
+    # 2. Build the tag set
+    launch_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+ 
+    tags = [
+        {'Key': 'LaunchDate', 'Value': launch_date},
+        {'Key': 'Environment', 'Value': 'Development'},
+        {'Key': 'ManagedBy', 'Value': 'auto-tagging-lambda'}
+    ]
+ 
+    # 3. Apply the tags to the instance
+    ec2.create_tags(Resources=[instance_id], Tags=tags)
+ 
+    # 4. Print a confirmation message
+    print(f'Successfully tagged instance {instance_id} '
+          f'with LaunchDate={launch_date}')
+ 
     return {
-        "statusCode": 200,
-        "instanceId": instance_id,
-        "tagsApplied": {
-            "LaunchDate": launch_date,
-            "Environment": DEFAULT_ENVIRONMENT,
-        },
+        'statusCode': 200,
+        'body': f'Tagged {instance_id} successfully'
     }
+
 ```
 </details>
 
@@ -340,4 +348,3 @@ print(f"Owner resolved via CloudTrail: {owner}")
 <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white"/>
 
 </div>
-
