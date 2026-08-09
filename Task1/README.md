@@ -1,1 +1,324 @@
+<div align="center">
 
+### AWS DEVOPS ASSIGNMENT
+
+# 🧹 Automated S3 Bucket Cleanup
+
+<img src="https://img.shields.io/badge/Task-01-blue?style=flat-square"/>
+<img src="https://img.shields.io/badge/Service-S3%20%7C%20Lambda%20%7C%20IAM-blue?style=flat-square"/>
+<img src="https://img.shields.io/badge/Runtime-Python%203.12%20(boto3)-blue?style=flat-square"/>
+<img src="https://img.shields.io/badge/Status-Completed%20%E2%9C%94-success?style=flat-square"/>
+
+### 🎯 Automatically delete stale S3 objects older than a retention threshold — zero manual cleanup.
+
+</div>
+
+---
+
+## 📘 Overview
+
+> This assignment automates deletion of **stale objects** in an S3 bucket using a Lambda function. The function paginates through all objects, compares each object's `LastModified` timestamp to the current UTC time, and deletes anything older than the retention window (30 days in production).
+
+| 🔑 Key | Detail |
+|---|---|
+| **Objective** | Delete S3 objects older than 30 days |
+| **Trigger** | Manual test event (can be scheduled via EventBridge) |
+| **Core AWS Services** | S3, Lambda, IAM |
+| **Language / SDK** | Python 3.12 + boto3 |
+| **Author** | *Moana* |
+
+---
+
+## 🗂️ Table of Contents
+
+1. [🏗️ Architecture Diagram](#️-architecture-diagram)
+2. [✅ Prerequisites](#-prerequisites)
+3. [🪣 Step 1 — S3 Bucket Setup](#-step-1--s3-bucket-setup)
+4. [🔐 Step 2 — IAM Role & Policy](#-step-2--iam-role--policy)
+5. [🧠 Step 3 — Lambda Function Setup](#-step-3--lambda-function-setup)
+6. [🐍 Step 4 — Lambda Code (Boto3)](#-step-4--lambda-code-boto3)
+7. [🧪 Step 5 — Testing & Verification](#-step-5--testing--verification)
+8. [💬 Discussion — Lambda vs. S3 Lifecycle Rules](#-discussion--lambda-vs-s3-lifecycle-rules)
+9. [🐞 Troubleshooting Reference](#-troubleshooting-reference)
+10. [📸 Screenshot Index](#-screenshot-index)
+11. [🏁 Summary](#-summary)
+
+---
+
+## 🏗️ Architecture Diagram
+
+```mermaid
+flowchart LR
+    A["⏰ Manual Trigger<br/>(or EventBridge Schedule)"] -->|invoke| B["🧠 Lambda Function<br/>s3-bucket-cleanup<br/>(Python 3.12 + boto3)"]
+    B --> C["1️⃣ List Objects<br/>paginator.paginate()"]
+    C --> D["2️⃣ Compare LastModified<br/>vs. now(UTC) - threshold"]
+    D --> E["3️⃣ Delete Object<br/>if older than threshold"]
+    E --> F["🖨️ Print deleted object keys"]
+
+    style A fill:#0969DA,color:#fff
+    style B fill:#0B3D91,color:#fff
+    style F fill:#2DA44E,color:#fff
+```
+
+> 💡 **Flow in one line:** `List (paginated) ➜ Compare Age ➜ Delete ➜ Log`
+
+---
+
+## ✅ Prerequisites
+
+- [x] AWS account with Console + CLI access
+- [x] An S3 bucket created (or ready to create) with a handful of test objects uploaded
+- [x] IAM permissions to create Roles and Lambda functions
+- [x] Willingness to temporarily lower the age threshold (e.g. minutes) for testing, then reset to 30 days
+
+---
+
+## 🪣 Step 1 — S3 Bucket Setup
+
+**STEP 1   Create the S3 Bucket and Upload Test Files**
+
+<img width="1225" height="494" alt="image" src="https://github.com/user-attachments/assets/494bc5e6-770d-403e-992f-b16a1dfa6baa" />
+
+------------------------------------------------------------------
+
+<img width="1222" height="521" alt="image" src="https://github.com/user-attachments/assets/7a9a0d36-e6ff-4267-b401-fdbe9aaf0fbc" />
+
+-------------------------------------------------------------------
+
+<img width="1224" height="569" alt="image" src="https://github.com/user-attachments/assets/7a8c0edb-f6c3-4c07-8baf-a0411708b61d" />
+
+--------------------------------------------------------------------
+
+<img width="1223" height="545" alt="image" src="https://github.com/user-attachments/assets/c6e81c9e-d5e4-4c5d-8613-31e5edf5471b" />
+
+--------------------------------------------------------------------
+| Setting | Value |
+|---|---|
+| **Bucket name** | `s3-cleanup-lab-<your-initials>` |
+| **Region** | e.g. `us-east-1` |
+| **Test objects** | Upload 3–5 sample files (`.txt` / `.log`) |
+
+> 🧪 **Testing tip:** You can't easily backdate an object's `LastModified`. Instead, set `MAX_AGE_MINUTES` (or seconds) in the Lambda env vars for your first test run, confirm deletion works, then switch the code to the real **30-day** threshold before final submission.
+
+📸 **Screenshot:**
+```
+![S3 Bucket Created](screenshots/01-s3-bucket-created.png)
+![Test Objects Uploaded](screenshots/02-s3-objects-uploaded.png)
+```
+
+---
+
+## 🔐 Step 2 — IAM Role & Policy
+
+**STEP 2   Create the IAM Role with a Least-Privilege Inline Policy**
+
+**Role name:** `lambda-s3-cleanup-role`
+
+| Action | Purpose |
+|---|---|
+| `s3:ListBucket` | List/paginate objects in the target bucket |
+| `s3:DeleteObject` | Delete objects that exceed the age threshold |
+
+<details>
+<summary>📄 <b>Click to expand — Inline IAM Policy JSON</b></summary>
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListBucketAccess",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::s3-cleanup-lab-<your-initials>"
+    },
+    {
+      "Sid": "DeleteObjectAccess",
+      "Effect": "Allow",
+      "Action": "s3:DeleteObject",
+      "Resource": "arn:aws:s3:::s3-cleanup-lab-<your-initials>/*"
+    }
+  ]
+}
+```
+</details>
+
+📸 **Screenshot:**
+
+-----------------------------------
+<img width="1225" height="597" alt="image" src="https://github.com/user-attachments/assets/7c4f0c65-cc2e-4902-8114-99357f2b6731" />
+
+-----------------------------------
+
+<img width="1226" height="620" alt="image" src="https://github.com/user-attachments/assets/355283af-b421-4edb-b8a1-4c65d2dea9b2" />
+
+-----------------------------------
+
+<img width="1223" height="618" alt="image" src="https://github.com/user-attachments/assets/effe63f8-6ca0-4217-8776-deebcf575eb5" />
+
+----------------------------------
+
+<img width="1223" height="596" alt="image" src="https://github.com/user-attachments/assets/05bd79d4-8533-4b93-bc07-150afd2b03ea" />
+
+---------------------------------
+
+
+
+> ⚠️ **Least privilege:** Both statements are scoped to the specific bucket ARN — never use `"Resource": "*"` for delete permissions in production.
+
+---
+
+## 🧠 Step 3 — Lambda Function Setup
+
+**STEP 3   Create the Lambda Function**
+
+| Setting | Value |
+|---|---|
+| **Function name** | `s3-bucket-cleanup` |
+| **Runtime** | Python 3.12 |
+| **Execution role** | `lambda-s3-cleanup-role` |
+| **Timeout** | 1 min |
+| **Env var** `BUCKET_NAME` | `s3-cleanup-lab-<your-initials>` |
+| **Env var** `MAX_AGE_DAYS` | `30` *(temporarily lower for testing)* |
+
+📸 **Screenshot:**
+
+------------------------------------------
+<img width="1222" height="621" alt="image" src="https://github.com/user-attachments/assets/8b2269d1-95a3-469b-b4ce-bab4a52ef98e" />
+
+-----------------------------------------
+<img width="1224" height="624" alt="image" src="https://github.com/user-attachments/assets/67e4c9b2-ae48-4bbb-9a56-31bedf98e46d" />
+
+------------------------------------------
+<img width="1220" height="429" alt="image" src="https://github.com/user-attachments/assets/1f89cda2-7f53-40d1-b9cb-f8f3a15115cb" />
+
+-----------------------------------------
+<img width="1224" height="607" alt="image" src="https://github.com/user-attachments/assets/aa1e7bd7-2ad5-4719-878d-7b5285727037" />
+
+-----------------------------------------
+---
+
+## 🐍 Step 4 — Lambda Code (Boto3)
+
+<details>
+<summary>📄 <b>Click to expand — lambda_function.py</b></summary>
+
+```python
+import boto3
+import os
+from datetime import datetime, timezone, timedelta
+
+s3 = boto3.client("s3")
+
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "30"))
+
+
+def lambda_handler(event, context):
+    if not BUCKET_NAME:
+        raise ValueError("Environment variable BUCKET_NAME is not set")
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=MAX_AGE_DAYS)
+    deleted_keys = []
+
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=BUCKET_NAME):
+        for obj in page.get("Contents", []):
+            last_modified = obj["LastModified"]  # already timezone-aware (UTC)
+            if last_modified < cutoff:
+                s3.delete_object(Bucket=BUCKET_NAME, Key=obj["Key"])
+                deleted_keys.append(obj["Key"])
+                print(f"Deleted: {obj['Key']} (LastModified: {last_modified})")
+
+    print(f"Total objects deleted: {len(deleted_keys)}")
+    return {
+        "statusCode": 200,
+        "bucket": BUCKET_NAME,
+        "deletedCount": len(deleted_keys),
+        "deletedKeys": deleted_keys,
+    }
+```
+</details>
+
+> 🧠 **Why the paginator?** `list_objects_v2` caps results at 1,000 keys per call. The paginator transparently walks every page, so buckets with tens of thousands of objects are still fully covered.
+
+📸 **Screenshot:**
+```
+![Lambda Code Deployed](screenshots/07-lambda-code.png)
+```
+
+---
+
+## 🧪 Step 5 — Testing & Verification
+
+| ✅ Check | Expected Outcome |
+|---|---|
+| Lambda execution status | `Succeeded`, no errors |
+| Deleted object count (test run) | Matches objects older than the lowered test threshold |
+| Remaining objects | Only newer files present in the bucket |
+| Final code | `MAX_AGE_DAYS` reset to `30` before submission |
+
+📸 **Screenshot:**
+```
+![Test Execution Result](screenshots/08-test-execution.png)
+![CloudWatch Logs - Deleted Keys](screenshots/09-cloudwatch-logs.png)
+![Bucket After Cleanup](screenshots/10-bucket-after-cleanup.png)
+```
+
+---
+
+## 💬 Discussion — Lambda vs. S3 Lifecycle Rules
+
+> In production, **S3 Lifecycle Rules** handle age-based deletion natively with **zero code** — they're cheaper, more reliable, and require no maintenance. **Lambda is the better choice** when cleanup needs **conditional logic** Lifecycle Rules can't express: deleting based on **object naming patterns**, **content inspection**, **cross-service actions** (e.g. notify via SNS, log to DynamoDB before deleting), or **business-rule exceptions** that go beyond a simple age threshold.
+
+---
+
+## 🐞 Troubleshooting Reference
+
+| Symptom | Likely Cause & Fix |
+|---|---|
+| `AccessDenied` on delete | IAM policy `Resource` ARN doesn't match the bucket/prefix exactly |
+| No objects deleted | `MAX_AGE_DAYS` too high, or all test objects are newer than cutoff |
+| `NoSuchBucket` | `BUCKET_NAME` env var typo or wrong region |
+| Only first 1,000 objects processed | Paginator not used — falls back to a single `list_objects_v2` call |
+| Objects deleted that shouldn't be | Forgot to reset `MAX_AGE_DAYS` back to 30 after testing |
+
+---
+
+## 📸 Screenshot Index
+
+| # | Step | File |
+|---|---|---|
+| 01 | S3 Bucket Created | `screenshots/01-s3-bucket-created.png` |
+| 02 | Test Objects Uploaded | `screenshots/02-s3-objects-uploaded.png` |
+| 03 | IAM Role Creation | `screenshots/03-iam-role.png` |
+| 04 | Inline Policy Attached | `screenshots/04-iam-policy.png` |
+| 05 | Lambda Function Created | `screenshots/05-lambda-create.png` |
+| 06 | Environment Variables | `screenshots/06-lambda-env-vars.png` |
+| 07 | Lambda Code Deployed | `screenshots/07-lambda-code.png` |
+| 08 | Test Execution Result | `screenshots/08-test-execution.png` |
+| 09 | CloudWatch Logs | `screenshots/09-cloudwatch-logs.png` |
+| 10 | Bucket After Cleanup | `screenshots/10-bucket-after-cleanup.png` |
+
+---
+
+## 🏁 Summary
+
+<div align="center">
+
+<img src="https://img.shields.io/badge/Result-Automated%20S3%20Retention%20Cleanup-2DA44E?style=for-the-badge"/>
+
+**List (paginated) ➜ Compare Age ➜ Delete ➜ Log** — a lightweight, serverless housekeeping pattern for object storage.
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://img.shields.io/badge/AWS-S3-orange?style=flat-square&logo=amazons3"/>
+<img src="https://img.shields.io/badge/AWS-Lambda-orange?style=flat-square&logo=awslambda"/>
+<img src="https://img.shields.io/badge/AWS-IAM-orange?style=flat-square&logo=amazoniam"/>
+<img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white"/>
+
+</div>
