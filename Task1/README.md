@@ -243,9 +243,11 @@ def lambda_handler(event, context):
 > 🧠 **Why the paginator?** `list_objects_v2` caps results at 1,000 keys per call. The paginator transparently walks every page, so buckets with tens of thousands of objects are still fully covered.
 
 📸 **Screenshot:**
-```
-![Lambda Code Deployed](screenshots/07-lambda-code.png)
-```
+
+-------------------------------------
+<img width="1205" height="486" alt="image" src="https://github.com/user-attachments/assets/ca7b9255-8f30-493c-8a3f-c519e2f1637d" />
+
+--------------------------------------
 
 ---
 
