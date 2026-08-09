@@ -62,21 +62,7 @@ flowchart LR
 
 ```
 
-```text
-flowchart LR
-    A["⏰ EventBridge Schedule (daily)"] -->|invoke| B["🧠 Lambda Function: s3-public-access-audit (Python 3.12 + boto3)"]
-    B --> C["1️⃣ ListAllMyBuckets"]
-    C --> D["2️⃣ For each bucket: GetPublicAccessBlock, GetBucketPolicyStatus, GetBucketAcl"]
-    D -->|"🚨 Public bucket found"| E["3️⃣ SNS Publish: alert with bucket name"]
-    E --> F["📧 Email Notification to subscribed address"]
-```
-
 > 💡 **Flow in one line:** `List Buckets ➜ Check 3 Public-Exposure Signals ➜ Publish SNS Alert ➜ Email`
-
-```
-
-> 💡 **Flow in one line:** `List Buckets ➜ Check 3 Public-Exposure Signals ➜ Publish SNS Alert ➜ Email`
-
 
 
 ---
