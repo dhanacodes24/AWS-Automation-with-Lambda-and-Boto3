@@ -87,25 +87,36 @@ flowchart LR
 
 > ✉️ After creating the subscription, **confirm it** via the link AWS sends to your inbox — unconfirmed subscriptions won't receive alerts.
 
-📸 **SSteps and Screenshots**
+📸 **Steps and Screenshots**
 ```
 ![SNS Topic Created](screenshots/01-sns-topic.png)
 ![Email Subscription Confirmed](screenshots/02-sns-subscription-confirmed.png)
 ```
 
 --------------------------------------
---------------------------------------
---------------------------------------
-
---------------------------------------
-
---------------------------------------
-
---------------------------------------
---------------------------------------
+** Selected Standard Topic*
 --------------------------------------
 
 
+--------------------------------------
+**Created Topic --> s3-public-bucket-alerts
+--------------------------------------
+
+--------------------------------------
+** Created Subscription
+--------------------------------------
+--------------------------------------
+
+** Received confirm subscription email
+--------------------------------------
+--------------------------------------
+
+** Confirmed subscriptions
+--------------------------------------
+--------------------------------------
+Confirmed status of subscription 
+--------------------------------------
+--------------------------------------
 ---
 
 ## 🔐 Step 2 — IAM Role & Policy
@@ -168,14 +179,18 @@ flowchart LR
 ![Inline Policy Attached](screenshots/04-iam-policy.png)
 ```
 --------------------------------------
+** Selected AWS service and lambda 
 --------------------------------------
+--------------------------------------
+** Created role lambda-s3-public-audit-role
 --------------------------------------
 
 --------------------------------------
-
+** Created inline policy S3PublicAuditInlinePolicy
+--------------------------------------
 --------------------------------------
 
---------------------------------------
+** Confirmed that policy attached to the role
 --------------------------------------
 --------------------------------------
 ---
@@ -384,16 +399,15 @@ def publish_alert(flagged_buckets):
 ![Lambda Code Deployed](screenshots/07-lambda-code.png)
 ```
 --------------------------------------
+** Selected Author from scratch in lambda function and selected Custome execution role
 --------------------------------------
+--------------------------------------
+** Deployed lambda function
 --------------------------------------
 
 --------------------------------------
 
---------------------------------------
 
---------------------------------------
---------------------------------------
---------------------------------------
 ---
 
 ## ⏰ Step 5 — EventBridge Daily Schedule
@@ -410,16 +424,20 @@ def publish_alert(flagged_buckets):
 ![EventBridge Daily Schedule](screenshots/08-eventbridge-schedule.png)
 ```
 --------------------------------------
+** Selected schedule from EventBridge
 --------------------------------------
+--------------------------------------
+** Selected AWS lambda 
 --------------------------------------
 
 --------------------------------------
-
+** Selected below options
+--------------------------------------
+--------------------------------------
+** Created schedule 
+--------------------------------------
 --------------------------------------
 
---------------------------------------
---------------------------------------
---------------------------------------
 ---
 
 ## 🧪 Step 6 — Testing & Verification
@@ -440,17 +458,65 @@ def publish_alert(flagged_buckets):
 ```
 
 --------------------------------------
+*Created  S3 bucket 
+--------------------------------------
+--------------------------------------
+*Unchecked Block Public Access setting for this bucket for testing
+--------------------------------------
+
+--------------------------------------
+*Edited bucket policy for testing purpose 
+--------------------------------------
+
+<details>
+<summary>📄 <b>Click to expand — Bucket policy JSON</b></summary>
+
+```json
+
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadForTestingOnly",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::s3-audit-test-bucket-dhana/*"
+    }
+  ]
+}
+
+```
+</details>
+
+
+--------------------------------------
+--------------------------------------
+*Now manually invoke lambda function
+--------------------------------------
+--------------------------------------
+**Tested response 
+--------------------------------------
+--------------------------------------
+*Received  email alert about Publicly accessible S3 bucket
+--------------------------------------
+--------------------------------------
+*Verified CloudWatch logs
 --------------------------------------
 --------------------------------------
 
+*After testing secured bucket again
+----------------------------------------------------------------------------
 --------------------------------------
-
---------------------------------------
-
+*Reinvoked lambda confirmed no public bucket for verification
 --------------------------------------
 --------------------------------------
+*Verified CloudWatch logs and confirmed no bucket has public access
 --------------------------------------
-
+--------------------------------------
+--------------------------------------
+--------------------------------------
 ---
 
 
