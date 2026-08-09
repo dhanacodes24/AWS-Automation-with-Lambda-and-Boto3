@@ -140,11 +140,19 @@ flowchart LR
 | **Timeout** | 30 sec |
 | **Env var** `DEFAULT_ENVIRONMENT` | `Development` |
 
-📸 **Screenshot:**
-```
-![Lambda Function Created](screenshots/03-lambda-create.png)
-![Environment Variables](screenshots/04-lambda-env-vars.png)
-```
+📸 **Steps and Screenshots:**
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
 
 ---
 
@@ -221,11 +229,23 @@ def lambda_handler(event, context):
 ```
 </details>
 
-📸 **Screenshot:**
+📸 **Steps and Screenshots:**
 ```
 ![EventBridge Rule Created](screenshots/06-eventbridge-rule.png)
 ![Event Pattern Configuration](screenshots/07-eventbridge-pattern.png)
 ```
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
 
 ---
 
@@ -238,13 +258,23 @@ def lambda_handler(event, context):
 | Lambda execution | `Succeeded`, no errors |
 | Tags on instance | `LaunchDate`, `Environment`, `AutoTagged` visible within seconds of launch |
 
-📸 **Screenshot:**
+📸 **Steps and Screenshots:**
 ```
 ![New Instance Launched](screenshots/08-instance-launched.png)
 ![CloudWatch Logs - Tagging Confirmation](screenshots/09-cloudwatch-logs.png)
 ![Tags Visible on Instance](screenshots/10-instance-tags.png)
 ```
+-------------------------------
 
+--------------------------------
+-------------------------------
+-------------------------------
+
+-------------------------------
+
+--------------------------------
+-------------------------------
+-------------------------------
 ---
 
 ## 🌟 Bonus — Auto-Resolve Owner via CloudTrail
@@ -296,34 +326,6 @@ print(f"Owner resolved via CloudTrail: {owner}")
 
 ---
 
-## 🐞 Troubleshooting Reference
-
-| Symptom | Likely Cause & Fix |
-|---|---|
-| Rule never fires | Event pattern typo, or rule disabled |
-| Tags don't appear | Instance ID missing from `event.detail` — check test event shape |
-| `AccessDenied` on `CreateTags` | Execution role missing `ec2:CreateTags` |
-| CloudTrail lookup returns `unknown` | Trail not enabled in-region, or event hasn't propagated yet (CloudTrail has delivery lag) |
-| Duplicate tagging on stop/start | Rule matches `running` on every transition — add idempotency check via `AutoTagged` tag |
-
----
-
-## 📸 Screenshot Index
-
-| # | Step | File |
-|---|---|---|
-| 01 | IAM Role Creation | `screenshots/01-iam-role.png` |
-| 02 | Inline Policy Attached | `screenshots/02-iam-policy.png` |
-| 03 | Lambda Function Created | `screenshots/03-lambda-create.png` |
-| 04 | Environment Variables | `screenshots/04-lambda-env-vars.png` |
-| 05 | Lambda Code Deployed | `screenshots/05-lambda-code.png` |
-| 06 | EventBridge Rule Created | `screenshots/06-eventbridge-rule.png` |
-| 07 | Event Pattern Configuration | `screenshots/07-eventbridge-pattern.png` |
-| 08 | New Instance Launched | `screenshots/08-instance-launched.png` |
-| 09 | CloudWatch Logs | `screenshots/09-cloudwatch-logs.png` |
-| 10 | Tags Visible on Instance | `screenshots/10-instance-tags.png` |
-| 11 | *(Bonus)* CloudTrail Event Lookup | `screenshots/11-cloudtrail-event.png` |
-| 12 | *(Bonus)* Owner Tag Applied | `screenshots/12-owner-tag.png` |
 
 ---
 
