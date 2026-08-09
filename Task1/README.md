@@ -73,9 +73,8 @@ flowchart LR
 
 ## 🪣 Step 1 — S3 Bucket Setup
 
- **STEP 1   Create the S3 Bucket and Upload Test Files** 
+$\Large{\textcolor{#87CEEB}{\textbf{ '**STEP 1   Create the S3 Bucket and Upload Test Files**'  }}}$ 
 
-$\Large{\textcolor{#87CEEB}{\textbf{ '<h2 style="color:skyblue;">STEP 1: Create the S3 Bucket and Upload Test Files</h2>' }}}$
 
 ------------------------------------------------------------------
 Selected General Purpose > Added Bucket Name
