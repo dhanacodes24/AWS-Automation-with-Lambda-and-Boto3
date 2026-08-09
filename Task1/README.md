@@ -127,19 +127,30 @@ flowchart LR
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "ListBucketAccess",
+      "Sid": "ListBucketObjects",
       "Effect": "Allow",
       "Action": "s3:ListBucket",
-      "Resource": "arn:aws:s3:::s3-cleanup-lab-<your-initials>"
+      "Resource": "arn:aws:s3:::dhanas3bucketobjectcleanup"
     },
     {
-      "Sid": "DeleteObjectAccess",
+      "Sid": "DeleteStaleObjects",
       "Effect": "Allow",
       "Action": "s3:DeleteObject",
-      "Resource": "arn:aws:s3:::s3-cleanup-lab-<your-initials>/*"
+      "Resource": "arn:aws:s3:::dhanas3bucketobjectcleanup/*"
+    },
+    {
+      "Sid": "AllowCloudWatchLogging",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
     }
   ]
 }
+
 ```
 </details>
 
@@ -205,38 +216,41 @@ flowchart LR
 
 ```python
 import boto3
-import os
 from datetime import datetime, timezone, timedelta
-
-s3 = boto3.client("s3")
-
-BUCKET_NAME = os.environ.get("BUCKET_NAME")
-MAX_AGE_DAYS = int(os.environ.get("MAX_AGE_DAYS", "30"))
-
-
+# ---- CONFIG ----
+BUCKET_NAME = "dhanas3bucketobjectcleanup"     # <-- replace with your bucket
+AGE_THRESHOLD_DAYS = 30              # final submission value
+# For quick testing only, you may temporarily use minutes instead:
+# AGE_THRESHOLD = timedelta(minutes=5)
+AGE_THRESHOLD = timedelta(days=AGE_THRESHOLD_DAYS)
+s3_client = boto3.client("s3")
 def lambda_handler(event, context):
-    if not BUCKET_NAME:
-        raise ValueError("Environment variable BUCKET_NAME is not set")
+   now_utc = datetime.now(timezone.utc)
+   cutoff = now_utc - AGE_THRESHOLD
+   deleted_keys = []
+   scanned_count = 0
+   paginator = s3_client.get_paginator("list_objects_v2")
+   # Never assume a single page of results -- always paginate.
+   for page in paginator.paginate(Bucket=BUCKET_NAME):
+       for obj in page.get("Contents", []):
+           scanned_count += 1
+           key = obj["Key"]
+           last_modified = obj["LastModified"]  # already timezone-aware (UTC)
+           if last_modified < cutoff:
+               s3_client.delete_object(Bucket=BUCKET_NAME, Key=key)
+               deleted_keys.append(key)
+               print(f"Deleted stale object: {key} (last modified {last_modified})")
+           else:
+               print(f"Kept object: {key} (last modified {last_modified})")
+   summary = {
+       "bucket": BUCKET_NAME,
+       "scanned_objects": scanned_count,
+       "deleted_count": len(deleted_keys),
+       "deleted_keys": deleted_keys,
+   }
+   print(f"Cleanup summary: {summary}")
+   return summary
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=MAX_AGE_DAYS)
-    deleted_keys = []
-
-    paginator = s3.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=BUCKET_NAME):
-        for obj in page.get("Contents", []):
-            last_modified = obj["LastModified"]  # already timezone-aware (UTC)
-            if last_modified < cutoff:
-                s3.delete_object(Bucket=BUCKET_NAME, Key=obj["Key"])
-                deleted_keys.append(obj["Key"])
-                print(f"Deleted: {obj['Key']} (LastModified: {last_modified})")
-
-    print(f"Total objects deleted: {len(deleted_keys)}")
-    return {
-        "statusCode": 200,
-        "bucket": BUCKET_NAME,
-        "deletedCount": len(deleted_keys),
-        "deletedKeys": deleted_keys,
-    }
 ```
 </details>
 
@@ -253,6 +267,8 @@ def lambda_handler(event, context):
 
 ## 🧪 Step 5 — Testing & Verification
 
+**Test → For testing purpose changed Threshold to 5 mins from 30 days  for testing purpose and Ran Lambda manually**
+
 | ✅ Check | Expected Outcome |
 |---|---|
 | Lambda execution status | `Succeeded`, no errors |
@@ -261,12 +277,33 @@ def lambda_handler(event, context):
 | Final code | `MAX_AGE_DAYS` reset to `30` before submission |
 
 📸 **Screenshot:**
-```
-![Test Execution Result](screenshots/08-test-execution.png)
-![CloudWatch Logs - Deleted Keys](screenshots/09-cloudwatch-logs.png)
-![Bucket After Cleanup](screenshots/10-bucket-after-cleanup.png)
-```
 
+----------------------------------------------------
+1)   Ran Lambda Function with threshold 5 mins 
+
+---------------------------------------------------
+
+<img width="1439" height="617" alt="image" src="https://github.com/user-attachments/assets/cb92fc98-2adf-49ee-b7d5-a6147eea54eb" />
+
+---------------------------------------------------
+
+2) In output we can see files are being deleted
+
+<img width="1419" height="602" alt="image" src="https://github.com/user-attachments/assets/3d2fbe48-bcfa-4ce1-bb25-3b57ee6be0e7" />
+
+--------------------------------------------------
+
+3) In S3 bucket We can see files got  deleted .
+
+ **BEFORE**
+
+<img width="1436" height="597" alt="image" src="https://github.com/user-attachments/assets/06a23854-2ce2-4c75-ae36-5e889b8607d2" />
+
+**AFTER**
+
+<img width="1440" height="675" alt="image" src="https://github.com/user-attachments/assets/745c3f2b-4c8d-481b-abd4-fb4f10224a24" />
+
+---------------------------------------------
 ---
 
 ## 💬 Discussion — Lambda vs. S3 Lifecycle Rules
