@@ -320,19 +320,6 @@ def lambda_handler(event, context):
 
 ---
 
-## 🐞 Troubleshooting Reference
-
-| Symptom | Likely Cause & Fix |
-|---|---|
-| `AccessDenied` on delete | IAM policy `Resource` ARN doesn't match the bucket/prefix exactly |
-| No objects deleted | `MAX_AGE_DAYS` too high, or all test objects are newer than cutoff |
-| `NoSuchBucket` | `BUCKET_NAME` env var typo or wrong region |
-| Only first 1,000 objects processed | Paginator not used — falls back to a single `list_objects_v2` call |
-| Objects deleted that shouldn't be | Forgot to reset `MAX_AGE_DAYS` back to 30 after testing |
-
----
-
-
 
 ---
 
