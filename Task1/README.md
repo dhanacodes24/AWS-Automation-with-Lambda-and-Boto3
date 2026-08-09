@@ -267,7 +267,6 @@ def lambda_handler(event, context):
 
 ## 🧪 Step 5 — Testing & Verification
 
-**Test → For testing purpose changed Threshold to 5 mins from 30 days  for testing purpose and Ran Lambda manually**
 
 | ✅ Check | Expected Outcome |
 |---|---|
@@ -276,7 +275,10 @@ def lambda_handler(event, context):
 | Remaining objects | Only newer files present in the bucket |
 | Final code | `MAX_AGE_DAYS` reset to `30` before submission |
 
-📸 **Screenshot:**
+📸 **Testing steps and Screenshot:**
+
+**Test → For testing purpose changed Threshold to 5 mins from 30 days  for testing purpose and Ran Lambda manually**
+
 
 ----------------------------------------------------
 1)   Ran Lambda Function with threshold 5 mins 
@@ -304,6 +306,12 @@ def lambda_handler(event, context):
 <img width="1440" height="675" alt="image" src="https://github.com/user-attachments/assets/745c3f2b-4c8d-481b-abd4-fb4f10224a24" />
 
 ---------------------------------------------
+
+4) We can verify the same in CloudWatch logs
+
+   <img width="1322" height="612" alt="image" src="https://github.com/user-attachments/assets/2e8108e4-57c2-491f-b935-269b7aa396e7" />
+
+-----------------------------------------
 ---
 
 ## 💬 Discussion — Lambda vs. S3 Lifecycle Rules
@@ -324,20 +332,7 @@ def lambda_handler(event, context):
 
 ---
 
-## 📸 Screenshot Index
 
-| # | Step | File |
-|---|---|---|
-| 01 | S3 Bucket Created | `screenshots/01-s3-bucket-created.png` |
-| 02 | Test Objects Uploaded | `screenshots/02-s3-objects-uploaded.png` |
-| 03 | IAM Role Creation | `screenshots/03-iam-role.png` |
-| 04 | Inline Policy Attached | `screenshots/04-iam-policy.png` |
-| 05 | Lambda Function Created | `screenshots/05-lambda-create.png` |
-| 06 | Environment Variables | `screenshots/06-lambda-env-vars.png` |
-| 07 | Lambda Code Deployed | `screenshots/07-lambda-code.png` |
-| 08 | Test Execution Result | `screenshots/08-test-execution.png` |
-| 09 | CloudWatch Logs | `screenshots/09-cloudwatch-logs.png` |
-| 10 | Bucket After Cleanup | `screenshots/10-bucket-after-cleanup.png` |
 
 ---
 
