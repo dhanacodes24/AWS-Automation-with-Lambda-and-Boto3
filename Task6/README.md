@@ -60,7 +60,7 @@ flowchart LR
     style E fill:#C0392B,color:#fff
     style F fill:#2DA44E,color:#fff
 
-
+```
 
 ```text
 flowchart LR
@@ -76,6 +76,8 @@ flowchart LR
 ```
 
 > 💡 **Flow in one line:** `List Buckets ➜ Check 3 Public-Exposure Signals ➜ Publish SNS Alert ➜ Email`
+
+
 
 ---
 
